@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Notification Demo</title>
+</head>
+<body>
+  <h2>Welcome to Jacob's Dashboard</h2>
+  <button onclick="sendNotification()">Show Notification</button>
+
+  <script>
+    function sendNotification() {
+      if (!('Notification' in window)) {
+        alert('This browser does not support notifications.');
+        return;
+      }
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          new Notification("Hi Jacob, 1,022 USDT has been added to your Account", {
+            body: "Tap to view your account.",
+            icon: "https://cdn-icons-png.flaticon.com/512/2920/2920057.png"
+          });
+        }
+      });
+    }
+  </script>
+</body>
+</html>
