@@ -4,70 +4,105 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Host Your Property - Nova Stays KE</title>
+
+  <!-- Bootstrap (optional) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+  </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
 
   <!-- Header -->
   <header class="bg-white shadow p-4 flex justify-between items-start">
     <h1 class="text-xl font-bold text-green-600">Nova Stays KE</h1>
-    <a href="listings.html" class="text-green-600 underline text-sm">← Back to Listings</a>
+    <div class="text-sm text-gray-600 text-right leading-snug">
+      <span class="font-semibold">Host Portal</span><br>
+      <span>Add a New Property</span>
+    </div>
   </header>
 
-  <main class="max-w-xl mx-auto mt-10 bg-white p-6 rounded-xl shadow">
-    <h2 class="text-lg font-bold mb-4 text-green-600">List Your Property</h2>
-    
+  <!-- Form Section -->
+  <main class="max-w-xl mx-auto mt-8 p-4 bg-white shadow-md rounded-lg">
+    <h2 class="text-lg font-bold mb-4 text-green-700">List Your Property</h2>
     <form id="hostForm" class="space-y-4">
-      <input type="text" placeholder="Property Title" id="title" class="w-full border px-3 py-2 rounded-md" required>
-      <input type="text" placeholder="Location (e.g. Nairobi)" id="location" class="w-full border px-3 py-2 rounded-md" required>
-      <input type="number" placeholder="Price per night (USD)" id="price" class="w-full border px-3 py-2 rounded-md" required>
-      <input type="url" placeholder="Image URL" id="image" class="w-full border px-3 py-2 rounded-md" required>
-      <input type="text" placeholder="Host Name" id="hostName" class="w-full border px-3 py-2 rounded-md" required>
-      <input type="url" placeholder="Host Avatar URL (optional)" id="hostAvatar" class="w-full border px-3 py-2 rounded-md">
 
-      <!-- Features -->
-      <div>
-        <label class="block mb-1 text-sm font-medium">Features</label>
+      <input type="text" name="title" placeholder="Property Title" class="w-full border px-3 py-2 rounded-md" required>
+      
+      <input type="text" name="location" placeholder="Location (e.g. Nairobi)" class="w-full border px-3 py-2 rounded-md" required>
+      
+      <input type="number" name="price" placeholder="Price per night (USD)" class="w-full border px-3 py-2 rounded-md" required>
+      
+      <input type="text" name="hostName" placeholder="Your Name" class="w-full border px-3 py-2 rounded-md" required>
+      
+      <input type="url" name="hostAvatar" placeholder="Your Avatar Image URL (optional)" class="w-full border px-3 py-2 rounded-md">
+      
+      <label class="block text-sm font-semibold mt-4 text-gray-700">Upload Image</label>
+      <input type="file" id="image" accept="image/*" class="w-full border px-3 py-2 rounded-md" required>
+
+      <div class="mt-4">
+        <p class="font-medium text-sm mb-1">Features:</p>
         <div class="flex flex-wrap gap-2 text-sm">
-          <label><input type="checkbox" value="WiFi" class="mr-1">WiFi</label>
-          <label><input type="checkbox" value="Pool" class="mr-1">Pool</label>
-          <label><input type="checkbox" value="Parking" class="mr-1">Parking</label>
-          <label><input type="checkbox" value="Breakfast" class="mr-1">Breakfast</label>
-          <label><input type="checkbox" value="TV" class="mr-1">TV</label>
-          <label><input type="checkbox" value="Balcony" class="mr-1">Balcony</label>
+          <label><input type="checkbox" value="WiFi"> WiFi</label>
+          <label><input type="checkbox" value="Parking"> Parking</label>
+          <label><input type="checkbox" value="TV"> TV</label>
+          <label><input type="checkbox" value="Hot Shower"> Hot Shower</label>
+          <label><input type="checkbox" value="Pool"> Pool</label>
+          <label><input type="checkbox" value="Balcony"> Balcony</label>
+          <label><input type="checkbox" value="Air Conditioning"> Air Conditioning</label>
+          <label><input type="checkbox" value="Breakfast"> Breakfast</label>
         </div>
       </div>
 
-      <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-md">Submit Listing</button>
+      <button type="submit" class="w-full mt-4 bg-green-600 hover:bg-green-700 text-white text-sm py-2 rounded-md">Submit Property</button>
     </form>
   </main>
 
   <script>
     const form = document.getElementById('hostForm');
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const features = [...form.querySelectorAll('input[type="checkbox"]:checked')].map(cb => cb.value);
+      const file = document.getElementById('image').files[0];
+      if (!file) return alert("Please upload an image");
 
-      const listing = {
-        title: form.title.value,
-        location: form.location.value,
-        price: form.price.value,
-        image: form.image.value,
-        hostName: form.hostName.value,
-        hostAvatar: form.hostAvatar.value || "https://i.pravatar.cc/40",
-        features,
-        rating: "⭐⭐⭐⭐☆ (New)"
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = function () {
+        const base64Image = reader.result;
+
+        const features = [...form.querySelectorAll('input[type="checkbox"]:checked')].map(cb => cb.value);
+
+        const listing = {
+          title: form.title.value,
+          location: form.location.value,
+          price: form.price.value,
+          image: base64Image,
+          hostName: form.hostName.value,
+          hostAvatar: form.hostAvatar.value || "https://i.pravatar.cc/40",
+          features,
+          rating: "⭐⭐⭐⭐☆ (New)"
+        };
+
+        const existing = JSON.parse(localStorage.getItem('novaListings') || '[]');
+        existing.push(listing);
+        localStorage.setItem('novaListings', JSON.stringify(existing));
+
+        alert('Property listed successfully!');
+        window.location.href = 'listings.html';
       };
-
-      const existing = JSON.parse(localStorage.getItem('novaListings') || '[]');
-      existing.push(listing);
-      localStorage.setItem('novaListings', JSON.stringify(existing));
-
-      alert('Property listed successfully!');
-      window.location.href = 'listings.html';
     });
   </script>
+
 </body>
 </html>
