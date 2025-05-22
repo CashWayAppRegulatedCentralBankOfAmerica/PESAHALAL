@@ -7,8 +7,6 @@
 
   <!-- Bootstrap (optional) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
@@ -37,17 +35,15 @@
     <form id="hostForm" class="space-y-4">
 
       <input type="text" name="title" placeholder="Property Title" class="w-full border px-3 py-2 rounded-md" required>
-      
       <input type="text" name="location" placeholder="Location (e.g. Nairobi)" class="w-full border px-3 py-2 rounded-md" required>
-      
       <input type="number" name="price" placeholder="Price per night (USD)" class="w-full border px-3 py-2 rounded-md" required>
-      
       <input type="text" name="hostName" placeholder="Your Name" class="w-full border px-3 py-2 rounded-md" required>
-      
-      <input type="url" name="hostAvatar" placeholder="Your Avatar Image URL (optional)" class="w-full border px-3 py-2 rounded-md">
-      
-      <label class="block text-sm font-semibold mt-4 text-gray-700">Upload Image</label>
-      <input type="file" id="image" accept="image/*" class="w-full border px-3 py-2 rounded-md" required>
+
+      <label class="block text-sm font-semibold mt-4 text-gray-700">Upload Listing Image</label>
+      <input type="file" id="listingImage" accept="image/*" class="w-full border px-3 py-2 rounded-md" required>
+
+      <label class="block text-sm font-semibold mt-4 text-gray-700">Upload Host Avatar</label>
+      <input type="file" id="hostAvatar" accept="image/*" class="w-full border px-3 py-2 rounded-md" required>
 
       <div class="mt-4">
         <p class="font-medium text-sm mb-1">Features:</p>
@@ -73,33 +69,45 @@
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const file = document.getElementById('image').files[0];
-      if (!file) return alert("Please upload an image");
+      const listingFile = document.getElementById('listingImage').files[0];
+      const avatarFile = document.getElementById('hostAvatar').files[0];
 
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = function () {
-        const base64Image = reader.result;
+      if (!listingFile || !avatarFile) {
+        return alert("Please upload both listing image and host avatar.");
+      }
 
-        const features = [...form.querySelectorAll('input[type="checkbox"]:checked')].map(cb => cb.value);
+      const reader1 = new FileReader();
+      const reader2 = new FileReader();
 
-        const listing = {
-          title: form.title.value,
-          location: form.location.value,
-          price: form.price.value,
-          image: base64Image,
-          hostName: form.hostName.value,
-          hostAvatar: form.hostAvatar.value || "https://i.pravatar.cc/40",
-          features,
-          rating: "⭐⭐⭐⭐☆ (New)"
+      reader1.readAsDataURL(listingFile);
+      reader2.readAsDataURL(avatarFile);
+
+      reader1.onload = function () {
+        const listingImage = reader1.result;
+
+        reader2.onload = function () {
+          const hostAvatar = reader2.result;
+
+          const features = [...form.querySelectorAll('input[type="checkbox"]:checked')].map(cb => cb.value);
+
+          const listing = {
+            title: form.title.value,
+            location: form.location.value,
+            price: form.price.value,
+            image: listingImage,
+            hostName: form.hostName.value,
+            hostAvatar: hostAvatar,
+            features,
+            rating: "⭐⭐⭐⭐☆ (New)"
+          };
+
+          const existing = JSON.parse(localStorage.getItem('novaListings') || '[]');
+          existing.push(listing);
+          localStorage.setItem('novaListings', JSON.stringify(existing));
+
+          alert('Property listed successfully!');
+          window.location.href = 'listings.html';
         };
-
-        const existing = JSON.parse(localStorage.getItem('novaListings') || '[]');
-        existing.push(listing);
-        localStorage.setItem('novaListings', JSON.stringify(existing));
-
-        alert('Property listed successfully!');
-        window.location.href = 'listings.html';
       };
     });
   </script>
